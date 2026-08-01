@@ -1,0 +1,69 @@
+/**
+ * -------------------------------------------------------------------------------
+ * 
+ * Consolidated I2C slave logic. SDA = GP1, SCL = GP0.
+ * 
+ * Mapping for sideset (base=GP0):
+ * bit 0: GP0 (SCL)
+ * bit 1: GP1 (SDA)
+ * 
+ * pindirs values:
+ * 0: Both Input
+ * 1: SCL Output low, SDA Input
+ * 2: SCL Input, SDA Output low
+ * 3: Both Output low
+ * 
+ * -------------------------------------------------------------------------------
+ */
+ 
+.program i2c_slave
+.side_set 2 opt pindirs
+
+; --- Start Condition Detect (SM 0, jmp_pin=SCL) ---
+public start_entry:
+    irq 4           ; Trigger Read SM
+    irq 1           ; Signal Restart
+public start_loop:
+    wait 1 pin 0    ; SDA high
+    wait 0 pin 0    ; SDA low
+    jmp pin start_entry ; If SCL high, it's a start
+    jmp start_loop
+
+; --- Stop Condition Detect (SM 1, jmp_pin=SCL) ---
+public stop_entry:
+    irq 1           ; Signal Stop
+public stop_loop:
+    wait 0 pin 0    ; SDA low
+    wait 1 pin 0    ; SDA high
+    jmp pin stop_entry ; If SCL high, it's a stop
+    jmp stop_loop
+
+; --- Read Byte (SM 2, jmp_pin=unused) ---
+public read_byte:
+    wait irq 4      ; Wait for Start
+public read_loop:
+    set x 7 side 0  ; Inputs
+bit_loop_read:
+    wait 0 gpio 0
+    wait 1 gpio 0
+    in pins 1
+    jmp x-- bit_loop_read
+    push noblock
+public do_ack:
+    out exec 16     ; CPU provides sequence
+    jmp do_ack
+
+; --- Write Byte (SM 3, jmp_pin=SDA) ---
+public write_byte:
+    wait irq 5      ; CPU trigger
+public write_loop:
+    set x 7 side 2  ; SDA output, SCL input
+bit_loop_write:
+    wait 0 gpio 0
+    out pins 1
+    wait 1 gpio 0
+    jmp x-- bit_loop_write
+    out null 32
+public wait_ack:
+    out exec 16     ; CPU provides sequence
+    jmp wait_ack
