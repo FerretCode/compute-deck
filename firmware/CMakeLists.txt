@@ -12,16 +12,12 @@ pico_sdk_init()
 
 add_executable(q10_keyboard
     main.c
-    i2c_multi.c
 )
-
-pico_generate_pio_header(q10_keyboard ${CMAKE_CURRENT_LIST_DIR}/i2c_multi.pio)
 
 target_link_libraries(q10_keyboard
     pico_stdlib
     hardware_i2c
-    hardware_pio
-    hardware_irq
+    pico_i2c_slave
 )
 
 pico_enable_stdio_usb(q10_keyboard 1)

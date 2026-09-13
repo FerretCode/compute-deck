@@ -702,7 +702,7 @@
         "uuid": "ad7d94d5-f839-4f00-8a9b-529ea36dcecb"
       }
     ],
-    "used_designators": "J5,#PWR34-35,Q2,SW2",
+    "used_designators": "R3-5,L1,D1-4,C1-8,C28-29,SW1-2,U1,U9,Q2,J2,#PWR3-5,#PWR31,#PWR34,#PWR61",
     "variants": []
   },
   "sheets": [
@@ -713,6 +713,10 @@
     [
       "cfbd952c-8410-4773-84c4-a908c597b59a",
       "RP2040 I2C Bridge"
+    ],
+    [
+      "7486f83b-1c48-4e78-aeba-722f7d0fc465",
+      "Battery Management"
     ]
   ],
   "text_variables": {},

@@ -1,0 +1,12 @@
+[Unit]
+Description=Q10 keyboard I2C-to-uinput driver
+After=multi-user.target
+
+[Service]
+ExecStart=/usr/bin/python3 /opt/q10-keyboard/keyboard_driver.py
+Restart=always
+RestartSec=1
+User=root
+
+[Install]
+WantedBy=multi-user.target
